@@ -1,26 +1,19 @@
-#define BOOST_BIND_GLOBAL_PLACEHOLDERS
-
-#include <boost/python/numpy.hpp>
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 
 #include "common.hpp"
 #include "romero.hpp"
 
-namespace paulidecomp {
+namespace py = pybind11;
 
-namespace {
+PYBIND11_MODULE(_romero, m) {
 
-namespace py = boost::python;
-namespace np = boost::python::numpy;
+        py::module::import("numpy"); ;  // This imports numpy internally
 
-BOOST_PYTHON_MODULE(_romero) {
-    Py_Initialize();
-    np::initialize();
-    py::def("_calc_inner_prods",
-            wrap_calc_inner_prods<romero::calc_inner_prods>);
-    py::def("_calc_pauli_vector",
-            wrap_calc_pauli_vector<romero::calc_pauli_vector>);
+        m.def("_calc_inner_prods",
+            paulidecomp::wrap_calc_inner_prods<paulidecomp::romero::calc_inner_prods>,
+                "Calculate inner products using Romero algorithm");
+        m.def("_calc_pauli_vector",
+            paulidecomp::wrap_calc_pauli_vector<paulidecomp::romero::calc_pauli_vector>,
+                "Calculate Pauli vector using Romero algorithm");
 }
-
-}  // namespace
-
-}  // namespace paulidecomp

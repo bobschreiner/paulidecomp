@@ -1,16 +1,18 @@
 #pragma once
 
-#define BOOST_BIND_GLOBAL_PLACEHOLDERS
-
-#include <boost/python/numpy.hpp>
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+#include <complex>
+#include <vector>
 
 namespace paulidecomp {
 
-constexpr std::complex<double> pow_i[4] = {1, 1j, -1, -1j};
+namespace py = pybind11;
+namespace np = pybind11;
 
-// constexpr std::complex<double> pauli_matrices[4][2][2] = {
-//     {{1, 0}, {0, 1}}, {{0, 1}, {1, 0}}, {{0, -1j}, {1j, 0}}, {{1, 0}, {0,
-//     -1}}};
+constexpr std::complex<double> pow_i[4] = {
+    {1.0, 0.0}, {0.0, 1.0}, {-1.0, 0.0}, {0.0, -1.0}
+};
 
 inline int get_power_of_2(int n) { return 1 << n; }
 
@@ -43,77 +45,63 @@ inline int get_mask_of_XY(int n, int n_qubit) {
     return mask;
 }
 
-namespace py = boost::python;
-namespace np = boost::python::numpy;
-
-std::vector<int> ndarray_to_vector_1d(np::ndarray &arr) {
-    const int length = arr.shape(0);
-    std::vector<int> vec(length);
-    const auto ptr = arr.get_data();
-    const int stride = arr.strides(0);
-    for (int i = 0; i < length; i++) {
-        vec[i] = *reinterpret_cast<int *>(ptr + i * stride);
+// Converts 1D NumPy array to std::vector<int>
+std::vector<int> ndarray_to_vector_1d(const py::array_t<int> &arr) {
+    auto r = arr.unchecked<1>();
+    std::vector<int> vec(r.shape(0));
+    for (ssize_t i = 0; i < r.shape(0); i++) {
+        vec[i] = r(i);
     }
     return vec;
 }
 
+// Converts 2D NumPy complex array to vector<vector<complex>>
 std::vector<std::vector<std::complex<double>>> ndarray_to_vector_2d(
-    np::ndarray &arr) {
-    const int height = arr.shape(0);
-    const int width = arr.shape(1);
-    std::vector<std::vector<std::complex<double>>> vec(
-        height, std::vector<std::complex<double>>(width));
-    const auto ptr = arr.get_data();
-    const int i_stride = arr.strides(0);
-    const int j_stride = arr.strides(1);
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            vec[i][j] = *reinterpret_cast<std::complex<double> *>(
-                ptr + i * i_stride + j * j_stride);
+    const py::array_t<std::complex<double>> &arr) {
+    auto r = arr.unchecked<2>();
+    std::vector<std::vector<std::complex<double>>> result(r.shape(0),
+        std::vector<std::complex<double>>(r.shape(1)));
+    for (ssize_t i = 0; i < r.shape(0); i++) {
+        for (ssize_t j = 0; j < r.shape(1); j++) {
+            result[i][j] = r(i, j);
         }
     }
-    return vec;
-}
-
-np::ndarray raw_array_to_ndarray_1d(std::complex<double> *ptr, int length) {
-    PyObject *capsule = ::PyCapsule_New(ptr, NULL, [](PyObject *self) -> void {
-        delete[] reinterpret_cast<std::complex<double> *>(
-            PyCapsule_GetPointer(self, NULL));
-    });
-    py::handle<> h_capsule{capsule};
-    py::object owner_capsule{h_capsule};
-    np::ndarray result = np::from_data(
-        ptr, np::dtype::get_builtin<std::complex<double>>(),
-        py::make_tuple(length), py::make_tuple(sizeof(std::complex<double>)),
-        owner_capsule);
     return result;
 }
 
+// Converts raw complex array to 1D NumPy array with memory ownership
+py::array_t<std::complex<double>> raw_array_to_ndarray_1d(
+    std::complex<double>* ptr, int length) {
+    return py::array_t<std::complex<double>>(
+        {length},
+        {sizeof(std::complex<double>)},
+        ptr,
+        py::capsule(ptr, [](void *p) {
+            delete[] reinterpret_cast<std::complex<double> *>(p);
+        }));
+}
+
+// Wrap calc_pauli_vector function for pybind11
 template <std::complex<double> *(*calc_pauli_vector_internal)(
     std::vector<std::vector<std::complex<double>>> &)>
-np::ndarray wrap_calc_pauli_vector(np::ndarray density_matrix) {
+py::array_t<std::complex<double>> wrap_calc_pauli_vector(
+    py::array_t<std::complex<double>> density_matrix) {
     const int size = density_matrix.shape(0);
-
-    std::vector<std::vector<std::complex<double>>> density_matrix_vec =
-        ndarray_to_vector_2d(density_matrix);
+    auto density_matrix_vec = ndarray_to_vector_2d(density_matrix);
     auto result_ptr = calc_pauli_vector_internal(density_matrix_vec);
-    auto result_arr = raw_array_to_ndarray_1d(result_ptr, size * size);
-    return result_arr;
+    return raw_array_to_ndarray_1d(result_ptr, size * size);
 }
 
+// Wrap calc_inner_prods function for pybind11
 template <std::complex<double> *(*calc_inner_prods_internal)(
     std::vector<std::vector<std::complex<double>>> &, std::vector<int> &)>
-np::ndarray wrap_calc_inner_prods(np::ndarray density_matrix,
-                                  np::ndarray indices) {
-    const int size = density_matrix.shape(0);
-
-    std::vector<std::vector<std::complex<double>>> density_matrix_vec =
-        ndarray_to_vector_2d(density_matrix);
-    std::vector<int> indices_vec = ndarray_to_vector_1d(indices);
-    auto result_ptr =
-        calc_inner_prods_internal(density_matrix_vec, indices_vec);
-    auto result_arr = raw_array_to_ndarray_1d(result_ptr, indices_vec.size());
-    return result_arr;
+py::array_t<std::complex<double>> wrap_calc_inner_prods(
+    py::array_t<std::complex<double>> density_matrix,
+    py::array_t<int> indices) {
+    auto density_matrix_vec = ndarray_to_vector_2d(density_matrix);
+    auto indices_vec = ndarray_to_vector_1d(indices);
+    auto result_ptr = calc_inner_prods_internal(density_matrix_vec, indices_vec);
+    return raw_array_to_ndarray_1d(result_ptr, indices_vec.size());
 }
 
-}  // namespace paulidecomp
+} // namespace paulidecomp

@@ -1,26 +1,20 @@
-#define BOOST_BIND_GLOBAL_PLACEHOLDERS
-
-#include <boost/python/numpy.hpp>
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 
 #include "common.hpp"
 #include "jones.hpp"
 
-namespace paulidecomp {
+namespace py = pybind11;
 
-namespace {
+PYBIND11_MODULE(_jones, m) {
+        
+        // Initialize NumPy
+        py::module::import("numpy");  // This imports numpy internally
 
-namespace py = boost::python;
-namespace np = boost::python::numpy;
-
-BOOST_PYTHON_MODULE(_jones) {
-    Py_Initialize();
-    np::initialize();
-    py::def("_calc_inner_prods",
-            wrap_calc_inner_prods<jones::calc_inner_prods>);
-    py::def("_calc_pauli_vector",
-            wrap_calc_pauli_vector<jones::calc_pauli_vector>);
+        m.def("_calc_inner_prods",
+            paulidecomp::wrap_calc_inner_prods<paulidecomp::jones::calc_inner_prods>,
+                "Calculate inner products using Jones algorithm");
+        m.def("_calc_pauli_vector",
+            paulidecomp::wrap_calc_pauli_vector<paulidecomp::jones::calc_pauli_vector>,
+                "Calculate Pauli vector using Jones algorithm");
 }
-
-}  // namespace
-
-}  // namespace paulidecomp

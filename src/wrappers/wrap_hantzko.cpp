@@ -1,28 +1,23 @@
-#define BOOST_BIND_GLOBAL_PLACEHOLDERS
-
-#include <boost/python/numpy.hpp>
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 
 #include "common.hpp"
 #include "hantzko.hpp"
 
-namespace paulidecomp {
+namespace py = pybind11;
 
-namespace {
 
-namespace py = boost::python;
-namespace np = boost::python::numpy;
+PYBIND11_MODULE(_hantzko, m) {
 
-BOOST_PYTHON_MODULE(_hantzko) {
-    Py_Initialize();
-    np::initialize();
-    py::def(
+    // Initialize NumPy
+    py::module::import("numpy");  // This imports numpy internally 
+
+    m.def(
         "_calc_pauli_vector_recursive",
-        wrap_calc_pauli_vector<hantzko::calc_pauli_vector_recursive_internal>);
-    py::def(
+        paulidecomp::wrap_calc_pauli_vector<paulidecomp::hantzko::calc_pauli_vector_recursive_internal>,
+        "Calculate the pauli vector recursively using Hantzko algorithm ");
+    m.def(
         "_calc_pauli_vector_iterative",
-        wrap_calc_pauli_vector<hantzko::calc_pauli_vector_iterative_internal>);
+        paulidecomp::wrap_calc_pauli_vector<paulidecomp::hantzko::calc_pauli_vector_iterative_internal>,
+        "Calculate the pauli vector iteratively using Hantzko algorithm ");
 }
-
-}  // namespace
-
-}  // namespace paulidecomp
