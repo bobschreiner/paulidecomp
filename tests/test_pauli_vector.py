@@ -13,7 +13,7 @@ from paulidecomp import romero as romerocpp
 
 def test_hamaguchi_simple():
     for n in range(0, 4):
-        in_ = np.eye(1 << n, dtype=np.complex_)
+        in_ = np.eye(1 << n, dtype=np.complex128)
         assert np.allclose(
             hamaguchicpp.calc_pauli_vector(in_), hamaguchinumba.calcPauliVector(in_)
         )
@@ -21,7 +21,7 @@ def test_hamaguchi_simple():
 
 def test_hantzko_simple():
     for n in range(0, 4):
-        in_ = np.eye(1 << n, dtype=np.complex_)
+        in_ = np.eye(1 << n, dtype=np.complex128)
         assert np.allclose(
             hantzkocpp.calc_pauli_vector_recursive(in_),
             hantzkonumba.calcPauliVector(in_),
@@ -34,7 +34,7 @@ def test_hantzko_simple():
 
 def test_jones_simple():
     for n in range(0, 4):
-        in_ = np.eye(1 << n, dtype=np.complex_)
+        in_ = np.eye(1 << n, dtype=np.complex128)
         assert np.allclose(
             jonescpp.calc_pauli_vector(in_), jonesnumba.calcPauliVector(in_)
         )
@@ -42,7 +42,7 @@ def test_jones_simple():
 
 def test_romero_simple():
     for n in range(0, 4):
-        in_ = np.eye(1 << n, dtype=np.complex_)
+        in_ = np.eye(1 << n, dtype=np.complex128)
         assert np.allclose(
             romerocpp.calc_pauli_vector(in_), romeronumba.calcPauliVector(in_)
         )

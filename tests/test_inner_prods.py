@@ -17,7 +17,7 @@ max_qubits = 5
 
 def test_hamaguchi_simple():
     for n in range(0, max_qubits + 1):
-        mat = np.eye(1 << n, dtype=np.complex_)
+        mat = np.eye(1 << n, dtype=np.complex128)
         for _ in range(10):
             length = random.randint(1, 4**n)
             inds = np.array(random.sample(range(4**n), length))
@@ -30,7 +30,7 @@ def test_hamaguchi_simple():
 
 def test_hantzko_simple():
     for n in range(0, max_qubits + 1):
-        mat = np.eye(1 << n, dtype=np.complex_)
+        mat = np.eye(1 << n, dtype=np.complex128)
         for _ in range(10):
             length = random.randint(1, 4**n)
             inds = np.array(random.sample(range(4**n), length))
@@ -42,7 +42,7 @@ def test_hantzko_simple():
 
 def test_jones_simple():
     for n in range(0, max_qubits + 1):
-        mat = np.eye(1 << n, dtype=np.complex_)
+        mat = np.eye(1 << n, dtype=np.complex128)
         for _ in range(10):
             length = random.randint(1, 4**n)
             inds = np.array(random.sample(range(4**n), length))
@@ -54,7 +54,7 @@ def test_jones_simple():
 
 def test_romero_simple():
     for n in range(0, max_qubits + 1):
-        mat = np.eye(1 << n, dtype=np.complex_)
+        mat = np.eye(1 << n, dtype=np.complex128)
         for _ in range(10):
             length = random.randint(1, 4**n)
             inds = np.array(random.sample(range(4**n), length))

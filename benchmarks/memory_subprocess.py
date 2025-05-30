@@ -38,4 +38,4 @@ print(f"method: {method_name}")
 print(f"{numQubits = }")
 
 method = method_dict[method_name]
-method(np.zeros((1 << numQubits, 1 << numQubits), dtype=np.complex_))
+method(np.zeros((1 << numQubits, 1 << numQubits), dtype=np.complex128))

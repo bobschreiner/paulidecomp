@@ -9,12 +9,12 @@ from paulidecomp._hantzko import (
 
 def calc_pauli_vector_recursive(matrix):
     _validate_density_matrix(matrix)
-    return _calc_pauli_vector_recursive(matrix.astype(np.complex_))
+    return _calc_pauli_vector_recursive(matrix.astype(np.complex128))
 
 
 def calc_pauli_vector_iterative(matrix):
     _validate_density_matrix(matrix)
-    return _calc_pauli_vector_iterative(matrix.astype(np.complex_))
+    return _calc_pauli_vector_iterative(matrix.astype(np.complex128))
 
 
 calc_pauli_vector = calc_pauli_vector_iterative
