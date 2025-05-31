@@ -22,7 +22,7 @@ To install the programm run:
     $ git clone https://github.com/bobschreiner/paulidecomp.git
     $ python3 -m venv venv
     $ source venv/bin/activate
-    $ cd pauli_lcu_omp
+    $ cd paulidecomp
     $ pip install -r requirements.txt
     $ pip install .
 
