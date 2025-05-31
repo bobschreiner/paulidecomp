@@ -1,6 +1,6 @@
 # paulidecomp
 
-## Overview
+## Overviewd
 
 <img src="benchmark.png" width="75%">
 
@@ -11,7 +11,7 @@ except for the iterative algorithm by Hantzko et al. [2] since it is not include
 
 ## Setup
 
-The C++ library `Boost` needs to be installed.
+The C++ library `Boost` is not needed for this version of paulidecomp.
 
 The `mprof` command is also required to run the memory benchmark.
 
