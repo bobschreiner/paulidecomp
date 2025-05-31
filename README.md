@@ -19,16 +19,16 @@ It is recommended to prepare and use a new virtual Python environment.
 
 To install the programm run: 
 
-    $ git clone https://github.com/bobschreiner/paulidecomp.git
+    $ git clone --recursive https://github.com/bobschreiner/paulidecomp.git
+    $ cd paulidecomp
     $ python3 -m venv venv
     $ source venv/bin/activate
-    $ cd paulidecomp
     $ pip install -r requirements.txt
-    $ pip install .
+    $ pip install -e .
 
 ## Test
 
-You can test the module with `python3 -m pytest tests`.
+You can test the module with `source venv/bin/activate && pytest`.
 
 ## Benchmark
 
