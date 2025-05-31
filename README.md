@@ -11,13 +11,20 @@ except for the iterative algorithm by Hantzko et al. [2] since it is not include
 
 ## Setup
 
-The C++ library `Boost` is not needed for this version of paulidecomp.
+The C++ library `Boost` is not needed for this version of paulidecomp and uses `pybind11`s instead
 
 The `mprof` command is also required to run the memory benchmark.
 
 It is recommended to prepare and use a new virtual Python environment.
 
-You need to run `pip3 install -r requirements.txt` to set up the module. You may need to change the version of the Boost.Python and Boost.Numpy in `setup.py`.
+To install the programm run: 
+
+    $ git clone https://github.com/bobschreiner/paulidecomp.git
+    $ python3 -m venv venv
+    $ source venv/bin/activate
+    $ cd pauli_lcu_omp
+    $ pip install -r requirements.txt
+    $ pip install .
 
 ## Test
 
